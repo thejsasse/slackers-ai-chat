@@ -456,9 +456,189 @@
     #messages { padding: 22px 16px; }
     .input-area { padding: 14px 16px 16px; }
   }
+
+  /* API KEY GATE */
+  #keyGate {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 13, 20, 0.92);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 24px;
+  }
+
+  .key-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px 44px;
+    max-width: 480px;
+    width: 100%;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+  }
+
+  .key-logo {
+    width: 48px;
+    height: 48px;
+    background: var(--accent);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    box-shadow: 0 0 24px var(--accent-glow);
+  }
+
+  .key-logo svg { width: 26px; height: 26px; }
+
+  .key-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem;
+    color: var(--text);
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .key-sub {
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin-bottom: 28px;
+  }
+
+  .key-sub a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .key-sub a:hover { text-decoration: underline; }
+
+  .key-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .key-input-wrap {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  #keyInput {
+    flex: 1;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: monospace;
+    letter-spacing: 0.04em;
+  }
+
+  #keyInput::placeholder {
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: 0;
+  }
+
+  #keyInput:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-dim);
+  }
+
+  .key-submit {
+    background: var(--accent);
+    border: none;
+    border-radius: 10px;
+    padding: 12px 22px;
+    color: #0e1117;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    white-space: nowrap;
+  }
+
+  .key-submit:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 16px var(--accent-glow);
+  }
+
+  .key-submit:active { transform: scale(0.97); }
+
+  .key-note {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    line-height: 1.55;
+  }
+
+  .key-note strong { color: var(--text-dim); font-weight: 500; }
+
+  .key-error {
+    font-size: 0.78rem;
+    color: #e8694a;
+    margin-top: 10px;
+    display: none;
+  }
+
+  .key-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-left: 8px;
+  }
+
+  .key-badge:hover { border-color: var(--text-muted); color: var(--text-dim); }
 </style>
 </head>
 <body>
+
+<!-- API KEY GATE -->
+<div id="keyGate">
+  <div class="key-card">
+    <div class="key-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#0e1117" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+        <path d="M2 17l10 5 10-5"/>
+        <path d="M2 12l10 5 10-5"/>
+      </svg>
+    </div>
+    <div class="key-title">Slackers AI</div>
+    <div class="key-sub">
+      Enter your Anthropic API key to get started. Your key is used only in this browser session — it's never stored or sent anywhere except directly to Anthropic.<br><br>
+      Don't have a key? Get one at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>.
+    </div>
+    <div class="key-label">Anthropic API Key</div>
+    <div class="key-input-wrap">
+      <input type="password" id="keyInput" placeholder="sk-ant-..." autocomplete="off" spellcheck="false" />
+      <button class="key-submit" onclick="submitKey()">Let's go →</button>
+    </div>
+    <div class="key-note">
+      <strong>Privacy:</strong> Your key is stored in memory only — closing or refreshing this tab clears it. It is never written to disk, logged, or sent anywhere other than the Anthropic API.
+    </div>
+    <div class="key-error" id="keyError"></div>
+  </div>
+</div>
 
 <header>
   <div class="header-left">
@@ -478,6 +658,7 @@
     <div class="ep-count"><strong>19</strong> episodes · Jaime Solis &amp; Jonathan Sasse</div>
     <div class="status-dot"><div class="dot"></div>Live</div>
     <button class="clear-btn" onclick="clearConversation()">New chat</button>
+    <span class="key-badge" onclick="resetKey()" title="Change API key">🔑 Key set</span>
   </div>
 </header>
 
@@ -711,7 +892,37 @@ const SUGGESTIONS = [
   "What should I listen to first?"
 ];
 
-// ─── STATE ────────────────────────────────────────────────────────────────────
+// ─── API KEY ──────────────────────────────────────────────────────────────────
+let apiKey = '';
+
+function submitKey() {
+  const val = document.getElementById('keyInput').value.trim();
+  const errEl = document.getElementById('keyError');
+  if (!val.startsWith('sk-ant-') || val.length < 20) {
+    errEl.textContent = 'That doesn\'t look like a valid Anthropic API key. It should start with sk-ant-';
+    errEl.style.display = 'block';
+    return;
+  }
+  apiKey = val;
+  errEl.style.display = 'none';
+  document.getElementById('keyGate').style.display = 'none';
+  document.querySelector('.key-badge').style.display = 'inline-flex';
+  inputEl.focus();
+}
+
+function resetKey() {
+  apiKey = '';
+  document.getElementById('keyInput').value = '';
+  document.getElementById('keyError').style.display = 'none';
+  document.getElementById('keyGate').style.display = 'flex';
+}
+
+// Allow Enter key in key input
+document.getElementById('keyInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') submitKey();
+});
+
+
 let conversation = [];
 let isLoading = false;
 
@@ -721,6 +932,9 @@ const sendBtn     = document.getElementById('sendBtn');
 const suggestionsEl = document.getElementById('suggestions');
 const errorNote   = document.getElementById('errorNote');
 const charCount   = document.getElementById('charCount');
+
+// Hide key badge until key is set
+document.querySelector('.key-badge').style.display = 'none';
 
 // ─── BUILD SUGGESTIONS ────────────────────────────────────────────────────────
 SUGGESTIONS.forEach(s => {
@@ -885,7 +1099,12 @@ async function sendMessage() {
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
