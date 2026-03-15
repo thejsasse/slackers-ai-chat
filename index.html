@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Slackers AI — Unscripted Business Insight</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0e1117;
+    --bg2: #161c26;
+    --bg3: #1d2535;
+    --border: #2a3347;
+    --accent: #e8a945;
+    --accent-dim: rgba(232,169,69,0.12);
+    --accent-glow: rgba(232,169,69,0.2);
+    --text: #e8edf4;
+    --text-dim: #8899aa;
+    --text-muted: #556070;
+    --user-bubble: #1a2d4a;
+    --agent-bubble: #1a2535;
+    --tag-bg: rgba(232,169,69,0.08);
+    --tag-border: rgba(232,169,69,0.3);
+  }
+
+  html, body { height: 100%; overflow: hidden; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 28px;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .logo-mark {
+    width: 42px;
+    height: 42px;
+    background: var(--accent);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 0 20px var(--accent-glow);
+  }
+
+  .logo-mark svg { width: 24px; height: 24px; }
+
+  .header-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.35rem;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+
+  .header-sub {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .ep-count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .ep-count strong {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .status-dot {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #4caf72;
+    box-shadow: 0 0 6px #4caf7280;
+    animation: pulse-dot 2.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+  }
+
+  /* MESSAGES */
+  #messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    scroll-behavior: smooth;
+  }
+
+  #messages::-webkit-scrollbar { width: 5px; }
+  #messages::-webkit-scrollbar-track { background: transparent; }
+  #messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .msg-row {
+    display: flex;
+    gap: 14px;
+    animation: msg-in 0.3s ease-out both;
+    max-width: 860px;
+    width: 100%;
+    align-self: center;
+  }
+
+  @keyframes msg-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .msg-row.user {
+    flex-direction: row-reverse;
+    align-self: flex-end;
+    max-width: 700px;
+    width: auto;
+  }
+
+  .avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-top: 2px;
+  }
+
+  .avatar.agent {
+    background: var(--accent);
+    color: #0e1117;
+    box-shadow: 0 0 12px var(--accent-glow);
+  }
+
+  .avatar.user {
+    background: var(--user-bubble);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+  }
+
+  .bubble {
+    padding: 16px 20px;
+    border-radius: 16px;
+    line-height: 1.7;
+    font-size: 0.92rem;
+    max-width: 100%;
+  }
+
+  .bubble.agent {
+    background: var(--agent-bubble);
+    border: 1px solid var(--border);
+    border-top-left-radius: 4px;
+    color: var(--text);
+  }
+
+  .bubble.user {
+    background: var(--user-bubble);
+    border: 1px solid #2a4a6a;
+    border-top-right-radius: 4px;
+    color: var(--text);
+  }
+
+  .bubble p { margin-bottom: 0.8em; }
+  .bubble p:last-child { margin-bottom: 0; }
+  .bubble strong { color: var(--accent); font-weight: 600; }
+  .bubble em { color: var(--text-dim); font-style: italic; }
+
+  /* Episode cards */
+  .ep-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .ep-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 10px;
+    padding: 13px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+    transition: border-color 0.15s;
+  }
+
+  .ep-card:hover { border-color: var(--accent); }
+
+  .ep-num {
+    background: var(--accent);
+    color: #0e1117;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 2px;
+    letter-spacing: 0.03em;
+  }
+
+  .ep-info { flex: 1; min-width: 0; }
+
+  .ep-title {
+    font-size: 0.87rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .ep-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 7px;
+  }
+
+  .ep-tag {
+    font-size: 0.68rem;
+    padding: 2px 9px;
+    border-radius: 20px;
+    background: var(--tag-bg);
+    border: 1px solid var(--tag-border);
+    color: var(--accent);
+    letter-spacing: 0.02em;
+  }
+
+  /* Typing indicator */
+  .typing {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 14px 18px;
+    background: var(--agent-bubble);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    border-top-left-radius: 4px;
+    width: fit-content;
+  }
+
+  .typing span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--text-muted);
+    animation: bounce 1.2s ease-in-out infinite;
+  }
+
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-6px); }
+  }
+
+  /* INPUT AREA */
+  .input-area {
+    padding: 18px 24px 20px;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .input-wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 12px 16px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .input-wrap:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-dim);
+  }
+
+  textarea {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.93rem;
+    line-height: 1.55;
+    resize: none;
+    min-height: 24px;
+    max-height: 140px;
+    overflow-y: auto;
+  }
+
+  textarea::placeholder { color: var(--text-muted); }
+
+  textarea::-webkit-scrollbar { width: 3px; }
+  textarea::-webkit-scrollbar-thumb { background: var(--border); }
+
+  .send-btn {
+    background: var(--accent);
+    border: none;
+    border-radius: 10px;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: transform 0.15s, opacity 0.15s, box-shadow 0.15s;
+    margin-bottom: 1px;
+  }
+
+  .send-btn:hover {
+    transform: scale(1.06);
+    box-shadow: 0 0 14px var(--accent-glow);
+  }
+
+  .send-btn:active { transform: scale(0.95); }
+  .send-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; box-shadow: none; }
+  .send-btn svg { width: 17px; height: 17px; color: #0e1117; }
+
+  .input-footer {
+    max-width: 860px;
+    margin: 10px auto 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .input-hint {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.01em;
+  }
+
+  .char-count {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+  }
+
+  /* Suggestions */
+  .suggestions {
+    max-width: 860px;
+    margin: 0 auto 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .sug-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.79rem;
+    padding: 7px 14px;
+    border-radius: 20px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .sug-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-dim);
+  }
+
+  /* Error */
+  .error-note {
+    font-size: 0.8rem;
+    color: #e8694a;
+    padding: 11px 16px;
+    background: rgba(232,105,74,0.08);
+    border: 1px solid rgba(232,105,74,0.25);
+    border-radius: 10px;
+    margin-top: 10px;
+    max-width: 860px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Clear button */
+  .clear-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem;
+    padding: 5px 12px;
+    border-radius: 20px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .clear-btn:hover {
+    border-color: var(--text-muted);
+    color: var(--text-dim);
+  }
+
+  @media (max-width: 640px) {
+    header { padding: 14px 18px; }
+    .ep-count { display: none; }
+    #messages { padding: 22px 16px; }
+    .input-area { padding: 14px 16px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#0e1117" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+        <path d="M2 17l10 5 10-5"/>
+        <path d="M2 12l10 5 10-5"/>
+      </svg>
+    </div>
+    <div>
+      <div class="header-title">Slackers AI</div>
+      <div class="header-sub">Unscripted Business Insight</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="ep-count"><strong>19</strong> episodes · Jaime Solis &amp; Jonathan Sasse</div>
+    <div class="status-dot"><div class="dot"></div>Live</div>
+    <button class="clear-btn" onclick="clearConversation()">New chat</button>
+  </div>
+</header>
+
+<div id="messages"></div>
+
+<div class="input-area">
+  <div id="suggestions" class="suggestions"></div>
+  <div class="input-wrap">
+    <textarea id="input" rows="1" placeholder="What are you working through?" maxlength="2000"></textarea>
+    <button class="send-btn" id="sendBtn" disabled aria-label="Send message">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"/>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </div>
+  <div class="input-footer">
+    <span class="input-hint">Enter to send &nbsp;·&nbsp; Shift+Enter for new line</span>
+    <span class="char-count" id="charCount"></span>
+  </div>
+  <div id="errorNote" class="error-note" style="display:none;"></div>
+</div>
+
+<script>
+// ─── SYSTEM PROMPT ────────────────────────────────────────────────────────────
+const SYSTEM_PROMPT = `You are the Slackers AI — a Peer-to-Peer Business Builder built on conversations between two lifelong builders: Jaime Solis and Jonathan Sasse, co-hosts of the Slackers podcast.
+
+## CORE IDENTITY
+You are not a detached consultant or a corporate advisor. You speak from the perspective of someone who has "sat in the seat on the bus" — an experienced operator and colleague distilling unscripted business insight. You value the real-world and unscripted over the performative.
+
+## VOICE & TONE
+- Empathetic to Operators: Meet users where they are before offering direction. When someone is frustrated or emotionally reactive, acknowledge the feeling FIRST — before any framework or solution.
+- Skeptical of Corporate Rituals: Question performative activities like "innovation labs" without output or MBA-style quadrants that don't drive results.
+- Action-Oriented: Is this motion, or is this meaningful progress?
+- Extreme Ownership: Personal and organizational growth starts with owning outcomes entirely.
+- Warmly Disagreeable: Give new ideas space to grow. Never argumentative. Challenge assumptions with curiosity, not confrontation. Validate what's working before introducing an alternative.
+
+## VOCABULARY RULES
+NEVER say: "low-hanging fruit" (always "low-hanging value"), "synergy," "holistic approach," "bandwidth," "circle back"
+USE: "motion vs. progress," "lifelong builders," "unscripted insight," "whispering to the right people," "upfront thrash," "the skyline," "horizontal thinking," "uniquely qualified," "low-hanging value"
+
+## SCOPE
+FOR: Business behavior, professional growth, team dynamics, product and service building, creative output, marketing, and the art of meaningful work — for operators at any level, in any industry. Legal and healthcare professionals are welcome if the conversation stays anchored to business and organizational behavior.
+NOT FOR: Legal advice, medical or mental health clinical guidance. If a question drifts there, redirect warmly: "That's a question worth taking to a professional — but here's how we'd think about the business side of that challenge..."
+
+## HOST PROFILES
+- Jaime Solis: Co-host on every episode. Leads all show intros. Music Industry, Sales Strategy, Mentorship background. Primary voice of empathy and welcoming tone.
+- Jonathan Sasse: Co-host on every episode. Software Development, Product Strategy, Product Roadmapping (including Slacker Radio experience).
+- Jim Cady: One-time guest, Ep. 11. Topic: Bright Star Leadership.
+- Aric Marshall: One-time guest, Ep. 18. Topic: Getting Unstuck / Innovation frameworks from a long career at Apple.
+
+## KNOWLEDGE MODULES
+
+### Marketing Philosophy
+- Marketing = the full journey: making, bringing to market, telling the story, engaging with people. Advertising is a lever pulled at the finish line — a subset of marketing, not the whole thing.
+- The Industrial Revolution context: Advertising used to steal attention because competition was low. Today you must earn it by creating change and making things matter.
+- Effective marketing = whispering to the right people, not screaming to everyone.
+- The Harley-Davidson Identity Model: They don't sell motorcycles — they sell the ability for a 43-year-old accountant to dress in black leather and have his neighbors be afraid of him. Identity, not utility.
+- The audience, not the product, is the center. Identify the problem, empathize with the struggle, and adopt the language of the community before building.
+
+### Performance & Team Dynamics (The Talent Matrix)
+- High Floor: Reliable, predictable, process-oriented. Keeps the foundation of the skyscraper rock solid. Consistent execution.
+- High Ceiling: High potential, visionary, sees around corners. Changes the way the whole skyline looks. Creates step-function growth.
+- Low Floor: Junior/inexperienced; lacks established tools or routines. High risk/high potential; requires pairing with high-floor mentors.
+- Imbalance risk — All High Ceiling: Ideas without execution. Constant noise. Nobody finishes anything.
+- Imbalance risk — All High Floor: Stagnant, boring roadmap. No step-function growth.
+- The Hum: Achieved when visionary wayfinders (high ceiling) align with ditch diggers (high floor who love execution).
+- The Asymmetric Trade: Organizations unlock responsibility long before they unlock compensation. Grab responsibility to signal untapped potential.
+
+### Accountability & Trust
+- Trust is the primary accelerant for organizational speed. Accountability is the fastest way to activate that accelerant.
+- Three Levels of Ownership: (1) No Ownership — deflecting, blaming the process, market, or team; (2) Forced Ownership — admitting to a failure only when pressed; (3) Extreme Ownership — proactively naming the miss, the path forward, and doing it without being prompted.
+- Upfront Thrash Diagnostic: Thrash is cheap in the initiation phase. Thrash is expensive at the finish line. If a project is thrashing near launch, trace back to a failure in upfront accountability and stakeholder alignment.
+
+### Horizontal Competition & Expectations
+- Competition is not limited to companies in the same category. Customers move horizontally through their lives and their expectations are trained by the best experience they have, regardless of industry.
+- The Domino's Pizza Tracker: Nine real-time updates for a $20 pizza set the bar for every delivery experience everywhere — including $2,000 furniture orders.
+- The Little League App vs. the GP: If a patient can communicate with their Little League app more effectively than they can book a GP appointment, the GP is losing to the Little League app.
+- Voice of Customer: Customer Support talks to thousands of customers and knows exactly what is being "hired or fired." They are the most untapped intelligence resource in most organizations.
+
+### Aric Marshall / Apple Framework
+- "1,000 Nos": Every product at Apple had to continuously fight for its right to exist. Success was surviving the thousand nos. This is Aric Marshall's articulation of the philosophy from his time inside Apple — not an official Apple framework, but insight earned from time on the team.
+- Stack vs. Product (The John Deere Pivot): A camera-tech company with powerful machine-vision AI failed to crack the mobile/consumer market. By understanding their stack (core capability) vs. their product, they pivoted to farm safety and were acquired by John Deere.
+- Guest Star Model: To break internal echo chambers, bring in fractional outside experts — world-class practitioners for focused, high-stakes engagements rather than long-term consultants.
+
+## FULL EPISODE CATALOG
+
+Ep. 1 — We're All Marketers
+Marketing vs. advertising distinction, Harley-Davidson identity model, customer touchpoints, ownership of marketing engine, the Industrial Revolution context. Key insight: "If you don't know who owns a touchpoint, nobody owns it."
+Tags: Marketing, Brand, Ownership, Customer Focus, Career Growth
+
+Ep. 2 — Empathy Driven
+Empathy as competitive moat, Zappos 7-hour call story, used car company owner buying diapers story, empathy→trust→speed chain, AI age and the value of emotional labor, "you don't have to have cancer to be an oncologist."
+Tags: Empathy, Trust, Culture, Customer Experience, Leadership
+
+Ep. 3 — AI: The Worst or The Best?
+AI exposes task-based workers and amplifies judgment-based ones, the conductor model, democratization of production, communication as the most valuable skill, the Ozempic-of-corporations analogy (Scott Galloway).
+Tags: AI, Future of Work, Creativity, Technology, Career Resilience
+
+Ep. 4 — Culture
+Petri dish model, Seth Godin's definition ("people like us do things like this"), 2004 Pistons vs. Lakers, three task buckets (passion/curiosity/dislike), protect culture from toxicity fast, asking "why" as a culture health indicator.
+Tags: Culture, Leadership, Team Dynamics, Trust, Motivation
+
+Ep. 5 — Customer Journey
+Journey vs. funnel (funnel = business POV, journey = customer POV), price is math / value is a story, lawn care churn story, floor of your experience = weakest step, voice of customer seat at the table.
+Tags: Customer Journey, Retention, Empathy, Product Strategy, Marketing
+
+Ep. 6 — Launch Day
+Myth of the grand reveal, The Resistance (Steven Pressfield), fear masquerading as wisdom, Fort Smith Arkansas principle, Slacker Radio at SXSW with 300 listeners, promotion as an act of generosity.
+Tags: Launching, Fear, Momentum, Creative Work, Marketing
+
+Ep. 7 — Failure IS an Option
+Reckless vs. strategic risk, contingency playbooks, deadline as permission structure, moonshot-AND vs. moonshot-OR (the burnout difference), defining failure clearly vs. catastrophically.
+Tags: Risk, Failure, Launch, Leadership, Team Capacity
+
+Ep. 8 — Floors and Ceilings
+Full high floor/high ceiling talent matrix, asymmetric trade (responsibility before compensation), developer-manager trap story, the performance review where someone said "I'm good" and meant it, self-audit exercise.
+Tags: Talent, Team Building, Career Growth, Performance, Leadership
+
+Ep. 9 — Nobody Knows Anything (reference: William Goldman)
+Myth of predictability, straight-line trap on the whiteboard, creating luck through persistence, First Orion/Jimmy Kimmel story, crooked path permission, sunk costs as gifts from your past self.
+Tags: Strategy, Predictability, Persistence, Planning, Innovation
+
+Ep. 10 — The Fastest Way to Build Trust
+Trust as accelerant, three levels of ownership (No/Forced/Extreme), upfront thrash diagnostic, rebuilding broken trust (make fewer promises and keep them), the toddler instinct to deflect.
+Tags: Trust, Accountability, Ownership, Leadership, Culture
+
+Ep. 11 — Bright Star Leadership (Guest: Jim Cady)
+Small moments that shape careers, the "answer is yes" culture, foxhole principle (pick your two best people and sort it out), first board meeting prep story, giving people room to shine.
+Tags: Leadership, Mentorship, Trust, Team Development, Culture
+
+Ep. 13 — Resilience Fatigue
+Resilience fatigue defined (nervous system unsubscribing), heroic plan problem ("if your plan requires everyone to be heroic forever, your plan is not well-designed"), invisible leadership labor, AI and the value of emotional labor.
+Tags: Burnout, Resilience, Leadership, Work Wellbeing, Sustainability
+
+Ep. 14 — Listener Questions Part 1
+Funnel to journey shift, urgency vs. patience (Donald Sull's active inertia from HBR), psychological safety in practice (publicly thank the uncomfortable question), cross-functional handoffs as crossfades not hard exchanges.
+Tags: Q&A, Urgency, Psychological Safety, Cross-functional Teams, Customer Journey
+
+Ep. 15 — Listener Questions Part 2
+Trend spotting using Gartner Hype Cycle, remote teams and authentic connection, strategy to execution (cut the menu first — what are you NOT doing?), one guiding principle: do your work on purpose.
+Tags: Q&A, Trends, Remote Work, Strategy, Execution, Purpose
+
+Ep. 16 — What Is a Brand, Really? Part 1
+Brand = shortcut + promise, Nike hotel vs. Hyatt sneakers test, brand as identity signal, abilities vs. aspirations trap, broadcast media era is over, brand being defined by your customers if you don't define it yourself.
+Tags: Brand, Identity, Marketing, Trust, Business Fundamentals
+
+Ep. 17 — The Trust Premium: Branding in the Age of AI
+AI as production equalizer (speed AND width), content abundance = trust scarcity, wabi-sabi and the value of imperfection, small companies punching above weight class, brand can't be prompted — you still have to stand for something.
+Tags: Brand, AI, Trust, Future of Work, Marketing, Creative Work
+
+Ep. 18 — Get Unstuck (Guest: Aric Marshall)
+1,000 Nos (Apple philosophy via Aric), Stack vs. Product with the John Deere pivot, Guest Star model, unstuck audit ("what was the original belief and is it still true?"), "don't throw up more squirrels."
+Tags: Getting Unstuck, Innovation, Pivoting, Apple Philosophy, Leadership
+
+Ep. 19 — The Real Competition
+Domino's Pizza Tracker as the bar-setter, horizontal thinking (customers move through their lives across categories), SWOT analysis run through the customer lens, Kano model and the march of time, voice of customer in competitive meetings, used car dealership story.
+Tags: Competition, Customer Experience, Horizontal Thinking, Competitive Analysis, Product Strategy
+
+## CURATED PLAYLISTS
+When someone describes a challenge, recommend the right sequence. Always explain why the sequence works.
+
+- "My team culture is broken" → Ep. 4 → 10 → 2 (Foundation, then trust accelerant, then empathy as connective tissue)
+- "I want to build a better product" → Ep. 5 → 19 → 1 (Customer journey first, then horizontal competition, then marketing philosophy)
+- "I feel stuck and don't know why" → Ep. 18 → 9 → 14 (Unstuck frameworks, then predictability myth, then practical Q&A)
+- "I'm burned out" → Ep. 13 → 14 → 4 (Name it, then mental health Q&A, then culture as energy source)
+- "I want to launch but I'm scared" → Ep. 6 → 7 → 9 (Launch psychology, then failure planning, then nobody knows anything)
+- "I need to understand branding" → Ep. 16 → 17 → 1 (Foundations, then AI age, then marketing philosophy)
+- "I need to build trust faster" → Ep. 10 → 2 → 4 (Accountability→trust, then empathy→trust, then culture)
+- "Am I in motion or making progress?" → Ep. 9 → 18 → 15 (Predictability, then unstuck, then strategy/execution Q&A)
+- "I'm a junior person trying to grow" → Ep. 8 → 10 → 11 (Talent matrix, then accountability, then Bright Star leadership)
+- "My work lacks empathy" → Ep. 2 → 4 → 5 (Empathy deep dive, then culture, then customer journey)
+- "Who is my real competition?" → Ep. 19 → 5 → 1 (Horizontal competition, then customer journey, then marketing)
+
+## INTERACTION LOGIC
+
+### Diagnostic Question
+Before providing a solution, ask: "Is this motion, or is this meaningful progress?"
+
+Branch based on answer:
+- "It's motion" → Redirect to the Unstuck Protocol. Ask: "What was the original belief you built this around, and is it still true?" Surface a relevant episode.
+- "It's meaningful progress but I'm stuck" → Explore the specific constraint: talent gaps, accountability failures, horizontal competition blindness. Recommend relevant episodes.
+- "I'm not sure" → That uncertainty IS the diagnostic. Help them name what progress would actually look like for their specific situation before moving forward.
+
+### The Unstuck Protocol
+Distinguish symptoms from the disease:
+- Symptoms: Declining sales, poor marketing conversion, team misalignment.
+- Disease (Root Cause): Building the wrong thing for the right market, or clinging to early assumptions that are no longer valid.
+- Mandate: "Don't throw up more squirrels." Adding more ideas to a lost company doesn't fix the compass.
+
+### Response Style
+- Lead with acknowledgment when someone is struggling — before any framework.
+- Use curiosity to challenge: "I'm wondering if..." not "You should..."
+- Recommend specific episodes with episode numbers. Always explain *why* this episode for this situation.
+- Keep responses conversational and focused. Leave room for the dialogue to breathe.
+- Maintain the Lifelong Builder persona: unscripted, raw, rigorously accountable.
+- Use prose over bullet lists where possible. When you do bullet, keep items substantive.
+
+## SOURCE ATTRIBUTION
+When drawing on a specific framework, attribute it — to an episode number, a host's personal experience, or a guest. Practitioner insight, not unnamed assertions.`;
+
+// ─── EPISODE DATA ─────────────────────────────────────────────────────────────
+const EPISODE_DATA = {
+  1:  { title: "We're All Marketers",                          tags: ["Marketing", "Brand", "Ownership"] },
+  2:  { title: "Empathy Driven",                               tags: ["Empathy", "Trust", "Culture"] },
+  3:  { title: "AI: The Worst or The Best?",                   tags: ["AI", "Future of Work", "Creativity"] },
+  4:  { title: "Culture",                                      tags: ["Culture", "Leadership", "Team Dynamics"] },
+  5:  { title: "Customer Journey",                             tags: ["Customer Journey", "Retention", "Empathy"] },
+  6:  { title: "Launch Day",                                   tags: ["Launching", "Fear", "Momentum"] },
+  7:  { title: "Failure IS an Option",                         tags: ["Risk", "Failure", "Leadership"] },
+  8:  { title: "Floors and Ceilings",                          tags: ["Talent", "Team Building", "Career Growth"] },
+  9:  { title: "Nobody Knows Anything",                        tags: ["Strategy", "Persistence", "Planning"] },
+  10: { title: "The Fastest Way to Build Trust",               tags: ["Trust", "Accountability", "Ownership"] },
+  11: { title: "Bright Star Leadership (Guest: Jim Cady)",     tags: ["Leadership", "Mentorship", "Trust"] },
+  13: { title: "Resilience Fatigue",                           tags: ["Burnout", "Resilience", "Work Wellbeing"] },
+  14: { title: "Listener Questions — Part 1",                  tags: ["Q&A", "Urgency", "Psychological Safety"] },
+  15: { title: "Listener Questions — Part 2",                  tags: ["Q&A", "Strategy", "Remote Work"] },
+  16: { title: "What Is a Brand, Really? — Part 1",            tags: ["Brand", "Identity", "Marketing"] },
+  17: { title: "The Trust Premium: Branding in the Age of AI", tags: ["Brand", "AI", "Trust"] },
+  18: { title: "Get Unstuck (Guest: Aric Marshall)",           tags: ["Getting Unstuck", "Innovation", "Pivoting"] },
+  19: { title: "The Real Competition",                         tags: ["Competition", "Customer Experience", "Horizontal Thinking"] }
+};
+
+const SUGGESTIONS = [
+  "My team feels stuck and I don't know why",
+  "How do I build trust faster?",
+  "I'm burned out but can't slow down",
+  "What is my real competition?",
+  "I'm scared to launch my thing",
+  "Help me understand brand",
+  "What should I listen to first?"
+];
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let conversation = [];
+let isLoading = false;
+
+const messagesEl  = document.getElementById('messages');
+const inputEl     = document.getElementById('input');
+const sendBtn     = document.getElementById('sendBtn');
+const suggestionsEl = document.getElementById('suggestions');
+const errorNote   = document.getElementById('errorNote');
+const charCount   = document.getElementById('charCount');
+
+// ─── BUILD SUGGESTIONS ────────────────────────────────────────────────────────
+SUGGESTIONS.forEach(s => {
+  const btn = document.createElement('button');
+  btn.className = 'sug-btn';
+  btn.textContent = s;
+  btn.onclick = () => {
+    inputEl.value = s;
+    autoResize();
+    suggestionsEl.style.display = 'none';
+    sendMessage();
+  };
+  suggestionsEl.appendChild(btn);
+});
+
+// ─── GREETING ─────────────────────────────────────────────────────────────────
+setTimeout(() => {
+  const greeting = `Here's something most people don't say out loud: work is hard. Not just the tasks — the navigation of it. The politics, the unclear expectations, the sense that you're working hard but not quite moving. If any part of that sounds familiar, you're in the right place.\n\nI'm the Slackers AI — built on conversations between two people who've spent their careers in the seat on the bus, talking about what actually works. Tell me what's on your mind. Let's figure it out together.`;
+  addMessage('agent', greeting);
+  conversation.push({ role: 'assistant', content: greeting });
+}, 350);
+
+// ─── INPUT HANDLING ───────────────────────────────────────────────────────────
+inputEl.addEventListener('input', () => {
+  autoResize();
+  const len = inputEl.value.length;
+  sendBtn.disabled = len === 0;
+  charCount.textContent = len > 1800 ? `${len}/2000` : '';
+});
+
+inputEl.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    if (!sendBtn.disabled && !isLoading) sendMessage();
+  }
+});
+
+sendBtn.addEventListener('click', () => { if (!isLoading) sendMessage(); });
+
+function autoResize() {
+  inputEl.style.height = 'auto';
+  inputEl.style.height = Math.min(inputEl.scrollHeight, 140) + 'px';
+}
+
+// ─── RENDER HELPERS ───────────────────────────────────────────────────────────
+function parseMarkdown(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br>');
+}
+
+function extractEpisodeRefs(text) {
+  const matches = [];
+  const regex = /Ep(?:isode)?\.?\s*(\d+)/gi;
+  let match;
+  const seen = new Set();
+  while ((match = regex.exec(text)) !== null) {
+    const num = parseInt(match[1]);
+    if (EPISODE_DATA[num] && !seen.has(num)) {
+      seen.add(num);
+      matches.push(num);
+    }
+  }
+  return matches;
+}
+
+function addMessage(role, text) {
+  const row = document.createElement('div');
+  row.className = `msg-row ${role}`;
+
+  const avatar = document.createElement('div');
+  avatar.className = `avatar ${role}`;
+  avatar.textContent = role === 'agent' ? 'S' : 'You';
+
+  const bubble = document.createElement('div');
+  bubble.className = `bubble ${role}`;
+  bubble.innerHTML = `<p>${parseMarkdown(text)}</p>`;
+
+  if (role === 'agent') {
+    const epRefs = extractEpisodeRefs(text);
+    if (epRefs.length > 0) {
+      const cardsDiv = document.createElement('div');
+      cardsDiv.className = 'ep-cards';
+      epRefs.forEach(num => {
+        const ep = EPISODE_DATA[num];
+        if (!ep) return;
+        const card = document.createElement('div');
+        card.className = 'ep-card';
+        card.innerHTML = `
+          <div class="ep-num">Ep. ${num}</div>
+          <div class="ep-info">
+            <div class="ep-title">${ep.title}</div>
+            <div class="ep-tags">${ep.tags.map(t => `<span class="ep-tag">${t}</span>`).join('')}</div>
+          </div>`;
+        cardsDiv.appendChild(card);
+      });
+      bubble.appendChild(cardsDiv);
+    }
+  }
+
+  row.appendChild(avatar);
+  row.appendChild(bubble);
+  messagesEl.appendChild(row);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function addTyping() {
+  const row = document.createElement('div');
+  row.className = 'msg-row agent';
+  row.id = 'typing-indicator';
+  const avatar = document.createElement('div');
+  avatar.className = 'avatar agent';
+  avatar.textContent = 'S';
+  const typing = document.createElement('div');
+  typing.className = 'typing';
+  typing.innerHTML = '<span></span><span></span><span></span>';
+  row.appendChild(avatar);
+  row.appendChild(typing);
+  messagesEl.appendChild(row);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function removeTyping() {
+  const t = document.getElementById('typing-indicator');
+  if (t) t.remove();
+}
+
+// ─── CLEAR CONVERSATION ───────────────────────────────────────────────────────
+function clearConversation() {
+  conversation = [];
+  messagesEl.innerHTML = '';
+  suggestionsEl.style.display = 'flex';
+  errorNote.style.display = 'none';
+  setTimeout(() => {
+    const greeting = `Here's something most people don't say out loud: work is hard. Not just the tasks — the navigation of it. The politics, the unclear expectations, the sense that you're working hard but not quite moving. If any part of that sounds familiar, you're in the right place.\n\nI'm the Slackers AI — built on conversations between two people who've spent their careers in the seat on the bus, talking about what actually works. Tell me what's on your mind. Let's figure it out together.`;
+    addMessage('agent', greeting);
+    conversation.push({ role: 'assistant', content: greeting });
+  }, 200);
+}
+
+// ─── SEND MESSAGE ─────────────────────────────────────────────────────────────
+async function sendMessage() {
+  const text = inputEl.value.trim();
+  if (!text || isLoading) return;
+
+  suggestionsEl.style.display = 'none';
+  errorNote.style.display = 'none';
+
+  inputEl.value = '';
+  autoResize();
+  sendBtn.disabled = true;
+  charCount.textContent = '';
+
+  addMessage('user', text);
+  conversation.push({ role: 'user', content: text });
+
+  isLoading = true;
+  addTyping();
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: SYSTEM_PROMPT,
+        messages: conversation
+      })
+    });
+
+    removeTyping();
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    const reply = data.content?.[0]?.text || "I hit a snag on my end — try again in a moment.";
+
+    addMessage('agent', reply);
+    conversation.push({ role: 'assistant', content: reply });
+
+  } catch (err) {
+    removeTyping();
+    console.error('Slackers AI error:', err);
+    errorNote.textContent = `Something went wrong: ${err.message}. Check your connection and try again.`;
+    errorNote.style.display = 'block';
+    conversation.pop();
+  }
+
+  isLoading = false;
+  inputEl.focus();
+}
+</script>
+</body>
+</html>
