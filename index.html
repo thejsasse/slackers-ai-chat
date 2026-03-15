@@ -630,7 +630,10 @@
     </div>
     <div class="key-label">Anthropic API Key</div>
     <div class="key-input-wrap">
-      <input type="password" id="keyInput" placeholder="sk-ant-..." autocomplete="off" spellcheck="false" />
+      <div style="position: relative; flex: 1; display: flex; align-items: center;">
+        <input type="password" id="keyInput" placeholder="sk-ant-..." autocomplete="off" spellcheck="false" style="width:100%; padding-right: 72px;" />
+        <button id="toggleBtn" onclick="toggleKeyVisibility()" style="position:absolute; right:10px; background:none; border:none; cursor:pointer; color:var(--text-muted); font-size:0.75rem; font-family:'DM Sans',sans-serif; padding:4px 6px; border-radius:4px; transition:color 0.15s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'">Show</button>
+      </div>
       <button class="key-submit" onclick="submitKey()">Let's go →</button>
     </div>
     <div class="key-note">
@@ -894,6 +897,20 @@ const SUGGESTIONS = [
 
 // ─── API KEY ──────────────────────────────────────────────────────────────────
 let apiKey = '';
+
+function toggleKeyVisibility() {
+  const inp = document.getElementById('keyInput');
+  const btn = document.getElementById('toggleBtn');
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    btn.textContent = 'Hide';
+    btn.style.color = 'var(--accent)';
+  } else {
+    inp.type = 'password';
+    btn.textContent = 'Show';
+    btn.style.color = 'var(--text-muted)';
+  }
+}
 
 function submitKey() {
   const val = document.getElementById('keyInput').value.trim();
