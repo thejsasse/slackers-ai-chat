@@ -986,7 +986,7 @@ const SUGGESTIONS = [
 ];
 
 // ─── API KEY ──────────────────────────────────────────────────────────────────
-let apiKey = '';
+let apiKey = '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';
 
 function toggleKeyVisibility() {
   const inp = document.getElementById('keyInput');
@@ -1040,8 +1040,9 @@ const suggestionsEl = document.getElementById('suggestions');
 const errorNote   = document.getElementById('errorNote');
 const charCount   = document.getElementById('charCount');
 
-// Hide key badge until key is set
-document.querySelector('.key-badge').style.display = 'none';
+// Key is hardcoded — hide the gate and show the badge immediately
+document.getElementById('keyGate').style.display = 'none';
+document.querySelector('.key-badge').style.display = 'none'; // hide badge too since key mgmt not needed
 
 // ─── BUILD SUGGESTIONS ────────────────────────────────────────────────────────
 SUGGESTIONS.forEach(s => {
