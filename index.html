@@ -156,9 +156,14 @@
 
   .msg-row.user {
     flex-direction: row-reverse;
-    align-self: flex-end;
-    max-width: 700px;
-    width: auto;
+    align-self: center;
+    max-width: 860px;
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .msg-row.user .bubble {
+    max-width: 580px;
   }
 
   .avatar {
@@ -492,7 +497,8 @@
     /* Messages — tighter, smaller font so responses don't over-wrap */
     #messages { padding: 14px 12px; gap: 14px; }
     .msg-row { gap: 8px; max-width: 100%; }
-    .msg-row.user { max-width: 85%; }
+    .msg-row.user { max-width: 100%; }
+    .msg-row.user .bubble { max-width: 85%; }
     .bubble { padding: 11px 13px; font-size: 0.82rem; line-height: 1.6; }
     .avatar { width: 26px; height: 26px; font-size: 0.65rem; margin-top: 1px; }
 
