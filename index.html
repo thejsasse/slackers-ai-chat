@@ -230,10 +230,25 @@
     display: flex;
     align-items: flex-start;
     gap: 13px;
-    transition: border-color 0.15s;
+    transition: all 0.2s;
+    text-decoration: none;
+    cursor: pointer;
   }
 
-  .ep-card:hover { border-color: var(--accent); }
+  .ep-card:hover {
+    border-color: var(--accent);
+    background: #eee8d0;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+  }
+
+  .ep-listen {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #2569b0;
+    margin-top: 6px;
+    letter-spacing: 0.03em;
+  }
 
   .ep-num {
     background: var(--accent);
@@ -955,25 +970,26 @@ This checklist is mandatory. Every response must pass all 11 points before sendi
 When drawing on a specific framework, attribute it to an episode number, a host's personal experience, or a guest. Practitioner insight, not unnamed assertions.`;
 
 // ─── EPISODE DATA ─────────────────────────────────────────────────────────────
+const BASE_URL = "https://slackerspod.simplecast.com/episodes/";
 const EPISODE_DATA = {
-  1:  { title: "We're All Marketers",                          tags: ["Marketing", "Brand", "Ownership"] },
-  2:  { title: "Empathy Driven",                               tags: ["Empathy", "Trust", "Culture"] },
-  3:  { title: "AI: The Worst or The Best?",                   tags: ["AI", "Future of Work", "Creativity"] },
-  4:  { title: "Culture",                                      tags: ["Culture", "Leadership", "Team Dynamics"] },
-  5:  { title: "Customer Journey",                             tags: ["Customer Journey", "Retention", "Empathy"] },
-  6:  { title: "Launch Day",                                   tags: ["Launching", "Fear", "Momentum"] },
-  7:  { title: "Failure IS an Option",                         tags: ["Risk", "Failure", "Leadership"] },
-  8:  { title: "Floors and Ceilings",                          tags: ["Talent", "Team Building", "Career Growth"] },
-  9:  { title: "Nobody Knows Anything",                        tags: ["Strategy", "Persistence", "Planning"] },
-  10: { title: "The Fastest Way to Build Trust",               tags: ["Trust", "Accountability", "Ownership"] },
-  11: { title: "Bright Star Leadership (Guest: Jim Cady)",     tags: ["Leadership", "Mentorship", "Trust"] },
-  13: { title: "Resilience Fatigue",                           tags: ["Burnout", "Resilience", "Work Wellbeing"] },
-  14: { title: "Listener Questions — Part 1",                  tags: ["Q&A", "Urgency", "Psychological Safety"] },
-  15: { title: "Listener Questions — Part 2",                  tags: ["Q&A", "Strategy", "Remote Work"] },
-  16: { title: "What Is a Brand, Really? — Part 1",            tags: ["Brand", "Identity", "Marketing"] },
-  17: { title: "The Trust Premium: Branding in the Age of AI", tags: ["Brand", "AI", "Trust"] },
-  18: { title: "Get Unstuck (Guest: Aric Marshall)",           tags: ["Getting Unstuck", "Innovation", "Pivoting"] },
-  19: { title: "The Real Competition",                         tags: ["Competition", "Customer Experience", "Horizontal Thinking"] }
+  1:  { title: "We're All Marketers",                          tags: ["Marketing", "Brand", "Ownership"],        slug: "were-all-marketers" },
+  2:  { title: "Empathy Driven",                               tags: ["Empathy", "Trust", "Culture"],            slug: "empathy-driven" },
+  3:  { title: "AI: The Worst or The Best?",                   tags: ["AI", "Future of Work", "Creativity"],     slug: "ai-the-worst-or-the-best" },
+  4:  { title: "Culture",                                      tags: ["Culture", "Leadership", "Team Dynamics"],  slug: "culture" },
+  5:  { title: "Customer Journey",                             tags: ["Customer Journey", "Retention", "Empathy"], slug: "customer-journey" },
+  6:  { title: "Launch Day",                                   tags: ["Launching", "Fear", "Momentum"],          slug: "launch-day" },
+  7:  { title: "Failure IS an Option",                         tags: ["Risk", "Failure", "Leadership"],          slug: "failure-is-an-option-launch-day-part-2" },
+  8:  { title: "Floors and Ceilings",                          tags: ["Talent", "Team Building", "Career Growth"], slug: "floors-and-ceilings" },
+  9:  { title: "Nobody Knows Anything",                        tags: ["Strategy", "Persistence", "Planning"],    slug: "nobody-knows-anything" },
+  10: { title: "The Fastest Way to Build Trust",               tags: ["Trust", "Accountability", "Ownership"],   slug: "the-fastest-way-to-build-trust" },
+  11: { title: "Bright Star Leadership (Guest: Jim Cady)",     tags: ["Leadership", "Mentorship", "Trust"],      slug: "bright-star-leadership-with-jim-cady" },
+  13: { title: "Resilience Fatigue",                           tags: ["Burnout", "Resilience", "Work Wellbeing"], slug: "resilience-fatigue" },
+  14: { title: "Listener Questions — Part 1",                  tags: ["Q&A", "Urgency", "Psychological Safety"], slug: "listener-questions-part-1" },
+  15: { title: "Listener Questions — Part 2",                  tags: ["Q&A", "Strategy", "Remote Work"],         slug: "listener-questions-part-2" },
+  16: { title: "What Is a Brand, Really? — Part 1",            tags: ["Brand", "Identity", "Marketing"],         slug: "what-is-a-brand-really-part-1" },
+  17: { title: "The Trust Premium: Branding in the Age of AI", tags: ["Brand", "AI", "Trust"],                   slug: "the-trust-premium-branding-in-the-age-of-ai-part-2" },
+  18: { title: "Get Unstuck (Guest: Aric Marshall)",           tags: ["Getting Unstuck", "Innovation", "Pivoting"], slug: "get-unstuck" },
+  19: { title: "The Real Competition",                         tags: ["Competition", "Customer Experience", "Horizontal Thinking"], slug: "the-real-competition" }
 };
 
 const SUGGESTIONS = [
@@ -1132,13 +1148,17 @@ function addMessage(role, text) {
       epRefs.forEach(num => {
         const ep = EPISODE_DATA[num];
         if (!ep) return;
-        const card = document.createElement('div');
+        const card = document.createElement('a');
         card.className = 'ep-card';
+        card.href = BASE_URL + (ep.slug || '');
+        card.target = '_blank';
+        card.rel = 'noopener noreferrer';
         card.innerHTML = `
           <div class="ep-num">Ep. ${num}</div>
           <div class="ep-info">
             <div class="ep-title">${ep.title}</div>
             <div class="ep-tags">${ep.tags.map(t => `<span class="ep-tag">${t}</span>`).join('')}</div>
+            <div class="ep-listen">Listen →</div>
           </div>`;
         cardsDiv.appendChild(card);
       });
