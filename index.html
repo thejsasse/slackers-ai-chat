@@ -25,7 +25,8 @@
     --tag-border: rgba(237,184,48,0.45);
   }
 
-  html, body { height: 100%; overflow: hidden; }
+  html, body { height: 100%; overflow: hidden; max-width: 100%; }
+  * { max-width: 100%; }
 
   body {
     font-family: 'Barlow', sans-serif;
@@ -133,12 +134,15 @@
   #messages {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 32px 24px;
     display: flex;
     flex-direction: column;
     gap: 28px;
     scroll-behavior: smooth;
     background: var(--bg);
+    width: 100%;
+    box-sizing: border-box;
   }
 
   #messages::-webkit-scrollbar { width: 5px; }
@@ -152,6 +156,8 @@
     max-width: 860px;
     width: 100%;
     align-self: center;
+    min-width: 0;
+    box-sizing: border-box;
   }
 
   @keyframes msg-in {
@@ -165,6 +171,8 @@
     max-width: 860px;
     width: 100%;
     justify-content: flex-start;
+    min-width: 0;
+    box-sizing: border-box;
   }
 
   .msg-row.user .bubble {
@@ -202,6 +210,10 @@
     line-height: 1.7;
     font-size: 0.92rem;
     max-width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    min-width: 0;
   }
 
   .bubble.agent {
@@ -341,6 +353,9 @@
     background: #2569b0;
     border-top: 3px solid var(--accent);
     flex-shrink: 0;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
   }
 
   .input-wrap {
