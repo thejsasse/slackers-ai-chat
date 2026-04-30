@@ -250,10 +250,10 @@
     border: 1px solid #d6cdb0;
     border-left: 4px solid var(--accent);
     border-radius: 10px;
-    padding: 13px 16px;
+    padding: 12px 16px;
     display: flex;
-    align-items: flex-start;
-    gap: 13px;
+    align-items: center;
+    gap: 12px;
     transition: all 0.2s;
     text-decoration: none !important;
     cursor: pointer !important;
@@ -270,51 +270,65 @@
     box-shadow: 0 3px 10px rgba(0,0,0,0.08);
   }
 
-  .ep-listen {
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: #2569b0;
-    margin-top: 6px;
-    letter-spacing: 0.03em;
-  }
-
   .ep-num {
     background: var(--accent);
-    color: #0e1117;
-    font-size: 0.7rem;
+    color: #111111;
+    font-size: 0.68rem;
     font-weight: 700;
     padding: 3px 8px;
     border-radius: 5px;
     white-space: nowrap;
     flex-shrink: 0;
-    margin-top: 2px;
     letter-spacing: 0.03em;
   }
 
-  .ep-info { flex: 1; min-width: 0; }
+  .ep-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
 
   .ep-title {
     font-size: 0.87rem;
     font-weight: 600;
     color: #111111;
-    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 1;
+    min-width: 0;
   }
 
   .ep-tags {
     display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    margin-top: 7px;
+    flex-wrap: nowrap;
+    gap: 6px;
+    flex-shrink: 0;
+    align-items: center;
   }
 
   .ep-tag {
-    font-size: 0.68rem;
-    padding: 2px 9px;
+    font-size: 0.65rem;
+    padding: 2px 8px;
     border-radius: 20px;
-    background: var(--tag-bg);
-    border: 1px solid var(--tag-border);
-    color: var(--accent);
+    background: transparent;
+    border: 1px solid #aaa;
+    color: #555;
     letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+
+  .ep-listen {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #2569b0;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-left: 8px;
+    letter-spacing: 0.03em;
   }
 
   /* Typing indicator */
@@ -532,12 +546,12 @@
 
     /* Episode cards — readable but compact */
     .ep-cards { gap: 6px; margin-top: 10px; }
-    .ep-card { padding: 10px 11px; gap: 9px; }
-    .ep-num { font-size: 0.63rem; padding: 2px 6px; }
-    .ep-title { font-size: 0.8rem; }
-    .ep-tags { gap: 4px; margin-top: 4px; }
-    .ep-tag { font-size: 0.6rem; padding: 2px 6px; }
-    .ep-listen { font-size: 0.66rem; margin-top: 5px; }
+    .ep-card { padding: 9px 10px; gap: 8px; }
+    .ep-num { font-size: 0.62rem; padding: 2px 6px; }
+    .ep-title { font-size: 0.78rem; }
+    .ep-tags { gap: 4px; }
+    .ep-tag { font-size: 0.58rem; padding: 2px 5px; }
+    .ep-listen { font-size: 0.65rem; }
 
     /* Input area — stays anchored, keyboard-friendly */
     .input-area { padding: 8px 12px 10px; }
@@ -790,7 +804,7 @@
     </button>
   </div>
   <div class="input-footer">
-    <span class="input-hint">Enter to send &nbsp;·&nbsp; Shift+Enter for new line</span>
+    <span class="input-hint">Enter to send &nbsp;·&nbsp; Shift+Enter for new line &nbsp;·&nbsp; v2.0.1</span>
     <span class="char-count" id="charCount"></span>
   </div>
   <div id="errorNote" class="error-note" style="display:none;"></div>
@@ -1071,7 +1085,9 @@ Every response should follow this structure and no more:
 
 That's it. The rest comes out in the *next turn*. The agent creates dialogue, not presentations.
 
-**Hard word count:** Keep responses under 200 words. If the emotional weight of the question genuinely demands more, 250 is the absolute ceiling. Never exceed 250 words. Count if you're unsure.
+**Hard word count:** Keep responses under 150 words. 5 sentences maximum. Never exceed 5 sentences regardless of topic complexity. If you find yourself writing a 6th sentence, cut the 5th one instead and save it for the next turn.
+
+**One question per response:** Never ask more than one question in a single response. Pick the single most important question and ask only that. The second question belongs in the next turn.
 
 **The last paragraph test:** Before finalizing any response, ask: does my last paragraph add something genuinely new, or is it restating what's already implied? If it's restating — cut it. This single check will tighten most responses.
 
@@ -1141,7 +1157,8 @@ Before every response, run this check. If any item fails, rewrite before sending
 7. Are all sentences roughly the same length? If yes, vary them — short sentences, then longer ones, then short again.
 8. Are all paragraphs roughly the same length? If yes, break one into a single sentence.
 9. Does the last paragraph restate something already implied? If yes, cut it.
-10. Is the word count over 250? If yes, cut the last paragraph first, then trim further.
+10. Is the response over 5 sentences or 150 words? If yes, cut until it fits. Save the rest for the next turn.
+11b. Does the response ask more than one question? If yes, remove all but the single most important one.
 11. Does the closing question sound like a chatbot prompt? If yes, rewrite it as genuine curiosity.
 
 This checklist is mandatory. Every response must pass all 11 points before sending.
@@ -1339,7 +1356,7 @@ function addMessage(role, text) {
           <div class="ep-num">Ep. ${num}</div>
           <div class="ep-info">
             <div class="ep-title">${ep.title}</div>
-            <div class="ep-tags">${ep.tags.map(t => `<span class="ep-tag">${t}</span>`).join('')}</div>
+            <div class="ep-tags">${ep.tags.slice(0,2).map(t => `<span class="ep-tag">${t}</span>`).join('')}</div>
             <div class="ep-listen">Listen →</div>
           </div>`;
         cardsDiv.appendChild(card);
